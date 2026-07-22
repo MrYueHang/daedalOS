@@ -186,7 +186,7 @@ const useLichtreichAppSync = (): void => {
           }
         )
       );
-      const validInstalledEntries: Array<[string, InstalledAppState]> = [];
+      const validInstalledEntries: [string, InstalledAppState][] = [];
 
       installedEntries.forEach((entry) => {
         if (entry) validInstalledEntries.push(entry);
