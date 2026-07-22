@@ -32,10 +32,13 @@ const STATE_FILE = `${STATE_DIRECTORY}/${STATE_FILE_NAME}`;
 const CONTROL_PLANE_URL =
   process.env.NEXT_PUBLIC_LICHTREICH_CONTROL_PLANE_URL || "";
 
-const emitStatus = (status: "error" | "ready" | "syncing" | "unknown") =>
+const emitStatus = (
+  status: "error" | "ready" | "syncing" | "unknown"
+): void => {
   window.dispatchEvent(
     new CustomEvent("lichtreich:app-sync", { detail: { status } })
   );
+};
 
 const readState = async (
   readFile: (path: string) => Promise<Buffer>
@@ -99,7 +102,7 @@ const useLichtreichAppSync = (): void => {
 
   useEffect(() => {
     if (!CONTROL_PLANE_URL || !rootFs || !sessionLoaded || syncedRef.current) {
-      return;
+      return undefined;
     }
 
     syncedRef.current = true;
@@ -133,42 +136,58 @@ const useLichtreichAppSync = (): void => {
       );
 
       const previousState = await readState(readFile);
-      const nextInstalled: Record<string, InstalledAppState> = {};
       const usedFileNames = new Set<string>();
+      const installedEntries = await Promise.all(
+        installations.installations.map(
+          async (
+            installation
+          ): Promise<[string, InstalledAppState] | undefined> => {
+            const manifest = manifests.get(installation.app_id);
 
-      for (const installation of installations.installations) {
-        const manifest = manifests.get(installation.app_id);
+            if (
+              !manifest ||
+              manifest.version !== installation.manifest_version
+            ) {
+              return undefined;
+            }
 
-        if (!manifest || manifest.version !== installation.manifest_version) {
-          continue;
-        }
+            let fileName = getShortcutFileName(manifest);
 
-        let fileName = getShortcutFileName(manifest);
+            if (usedFileNames.has(fileName)) {
+              fileName = `${fileName.slice(0, -4)} (${manifest.id}).url`;
+            }
+            usedFileNames.add(fileName);
 
-        if (usedFileNames.has(fileName)) {
-          fileName = `${fileName.slice(0, -4)} (${manifest.id}).url`;
-        }
-        usedFileNames.add(fileName);
+            const shortcut = createManifestShortcut(manifest);
+            const shortcutPath = join(DESKTOP_PATH, fileName);
+            const writtenName = await createPath(
+              fileName,
+              DESKTOP_PATH,
+              Buffer.from(shortcut),
+              0,
+              true
+            );
 
-        const shortcut = createManifestShortcut(manifest);
-        const shortcutPath = join(DESKTOP_PATH, fileName);
-        const writtenName = await createPath(
-          fileName,
-          DESKTOP_PATH,
-          Buffer.from(shortcut),
-          0,
-          true
-        );
+            if (!writtenName) return undefined;
 
-        if (!writtenName) continue;
+            await updateFolder(DESKTOP_PATH, writtenName);
 
-        await updateFolder(DESKTOP_PATH, writtenName);
-        nextInstalled[manifest.id] = {
-          manifest_version: manifest.version,
-          shortcut_checksum: await sha256Text(shortcut),
-          shortcut_path: shortcutPath,
-        };
-      }
+            return [
+              manifest.id,
+              {
+                manifest_version: manifest.version,
+                shortcut_checksum: await sha256Text(shortcut),
+                shortcut_path: shortcutPath,
+              },
+            ];
+          }
+        )
+      );
+      const nextInstalled = Object.fromEntries(
+        installedEntries.filter(
+          (entry): entry is [string, InstalledAppState] => Boolean(entry)
+        )
+      );
 
       await Promise.all(
         Object.entries(previousState?.installed || {}).map(
@@ -218,7 +237,9 @@ const useLichtreichAppSync = (): void => {
       if (!controller.signal.aborted) emitStatus("unknown");
     });
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [createPath, deletePath, readFile, rootFs, sessionLoaded, updateFolder]);
 };
 
