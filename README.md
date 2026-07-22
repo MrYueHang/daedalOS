@@ -92,6 +92,20 @@
     - `/?url=/CREDITS.md`
     - `/?app=Browser`
 
+### LICHTREICH app sync
+
+Set `NEXT_PUBLIC_LICHTREICH_CONTROL_PLANE_URL` to an HTTPS endpoint on
+`lichtreich.info` or one of its subdomains to enable the optional desktop app
+sync. The client requests the authorized catalog and the effective installation
+receipts with the existing browser session. It materializes verified
+`browser_window` manifests as `.url` files in the IndexedDB-backed desktop.
+
+The sync grants no capabilities, accepts no raw secrets, ignores undocumented
+or non-installable apps, requires a matching SHA-256 manifest checksum, and
+removes only unchanged shortcuts that it created itself. If the endpoint is not
+configured, unavailable, or returns an unauthorized response, the static
+desktop shortcuts continue to work unchanged.
+
 # Apps 🧪
 
 ### [BoxedWine](http://www.boxedwine.org/) (**_.exe, .zip_**)
