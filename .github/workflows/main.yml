@@ -50,10 +50,20 @@ jobs:
       - name: Build production app
         run: yarn build
 
-      - name: Install Playwright browsers
+      - name: Install Chromium for pull-request smoke test
+        if: github.event_name == 'pull_request'
+        run: yarn playwright install --with-deps chromium
+
+      - name: Run Chromium E2E smoke test
+        if: github.event_name == 'pull_request'
+        run: yarn e2e --project=chromium
+
+      - name: Install all Playwright browsers
+        if: github.event_name != 'pull_request'
         run: yarn playwright install --with-deps
 
-      - name: Run Playwright E2E tests
+      - name: Run full cross-browser E2E tests
+        if: github.event_name != 'pull_request'
         run: yarn e2e
 
       - name: Upload Playwright report
