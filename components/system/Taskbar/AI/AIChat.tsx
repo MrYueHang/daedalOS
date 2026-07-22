@@ -57,12 +57,19 @@ import { useWindowAI } from "hooks/useWindowAI";
 import { useFileSystem } from "contexts/fileSystem";
 import { readPdfText } from "components/apps/PDF/functions";
 import { useSnapshots } from "hooks/useSnapshots";
+import { useProcesses } from "contexts/process";
+import {
+  DESKTOP_PROCESS_IDS,
+  MODULE_HEADS,
+  isDesktopProcessId,
+} from "components/system/Taskbar/AI/moduleHeads";
 
 type AIChatProps = {
   toggleAI: () => void;
 };
 
 const STREAMING_SUPPORT = true;
+const BROWSER_PROTOCOLS = new Set(["http:", "https:"]);
 
 const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
   const {
@@ -79,6 +86,13 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
   const [primaryColor, secondaryColor, tertiaryColor] =
     taskbarColor.ai[convoStyle];
   const [promptText, setPromptText] = useState("");
+  const [activeHeadId, setActiveHeadId] = useState(MODULE_HEADS[0].id);
+  const activeHead = useMemo(
+    () =>
+      MODULE_HEADS.find(({ id }) => id === activeHeadId) || MODULE_HEADS[0],
+    [activeHeadId]
+  );
+  const { open } = useProcesses();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const typing = promptText.length > 0;
@@ -114,13 +128,101 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
     },
     []
   );
+  const runDesktopCommand = useCallback(
+    (text: string): boolean => {
+      const [command = "", processId = "", ...argumentParts] = text
+        .trim()
+        .split(/\s+/);
+
+      if (command === "/help") {
+        addMessage(escapeHtml(text), "user");
+        addMessage(
+          "Available local commands:\n\n- `/apps` lists openable desktop apps.\n- `/open Browser https://example.org` opens a verified web URL.\n- `/open FileExplorer /Documents` opens a local folder.\n- `/open Paint` opens an app.\n\nChoose the responsible module head above before asking a domain-specific question.",
+          "ai"
+        );
+
+        return true;
+      }
+
+      if (command === "/apps") {
+        addMessage(escapeHtml(text), "user");
+        addMessage(
+          `Openable desktop apps (${DESKTOP_PROCESS_IDS.length}):\n\n${DESKTOP_PROCESS_IDS.join(
+            ", "
+          )}`,
+          "ai"
+        );
+
+        return true;
+      }
+
+      if (command !== "/open") return false;
+
+      addMessage(escapeHtml(text), "user");
+
+      if (!isDesktopProcessId(processId)) {
+        addMessage(
+          `Not opened: \`${processId || "missing app"}\` is not in the verified desktop allowlist. Use \`/apps\` to list valid IDs.`,
+          "ai"
+        );
+
+        return true;
+      }
+
+      const target = argumentParts.join(" ");
+
+      if (target && processId === "Browser") {
+        try {
+          const url = new URL(target);
+
+          if (!BROWSER_PROTOCOLS.has(url.protocol)) {
+            throw new Error("Unsupported URL protocol");
+          }
+
+          open(processId, { url: url.toString() });
+          addMessage(`Opened \`${processId}\` with \`${url.toString()}\`.`, "ai");
+        } catch {
+          addMessage(
+            "Not opened: Browser accepts only a complete `http://` or `https://` URL.",
+            "ai"
+          );
+        }
+
+        return true;
+      }
+
+      if (target && processId === "FileExplorer" && target.startsWith("/")) {
+        open(processId, { url: target });
+        addMessage(`Opened \`${processId}\` at \`${target}\`.`, "ai");
+
+        return true;
+      }
+
+      if (target) {
+        addMessage(
+          "Not opened: only Browser URLs and absolute FileExplorer paths accept an argument.",
+          "ai"
+        );
+
+        return true;
+      }
+
+      open(processId);
+      addMessage(`Opened \`${processId}\`.`, "ai");
+
+      return true;
+    },
+    [addMessage, open]
+  );
   const addUserPrompt = useCallback(() => {
     if (promptText) {
-      addMessage(escapeHtml(promptText), "user");
+      const commandHandled = runDesktopCommand(promptText);
+
+      if (!commandHandled) addMessage(escapeHtml(promptText), "user");
       (textAreaRef.current as HTMLTextAreaElement).value = "";
       setPromptText("");
     }
-  }, [addMessage, promptText]);
+  }, [addMessage, promptText, runDesktopCommand]);
   const lastAiMessageIndex = useMemo(
     () =>
       conversation.length -
@@ -234,10 +336,12 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
       streamId: STREAMING_SUPPORT ? conversation.length : undefined,
       style: convoStyle,
       summarizeText,
+      systemPrompt: activeHead.systemPrompt,
       text,
     });
   }, [
     addMessage,
+    activeHead.systemPrompt,
     aiWorker,
     conversation,
     convoStyle,
@@ -393,6 +497,24 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
         <div className="convo-header">
           <div className="title">
             <AIIcon /> {AI_TITLE}
+          </div>
+          <div className="module-head">
+            <label htmlFor="module-head-select">Head of module</label>
+            <select
+              id="module-head-select"
+              onChange={({ target: { value } }) => {
+                newTopic();
+                setActiveHeadId(value);
+              }}
+              value={activeHeadId}
+            >
+              {MODULE_HEADS.map(({ id, label: headLabel }) => (
+                <option key={id} value={id}>
+                  {headLabel}
+                </option>
+              ))}
+            </select>
+            <span>Local AI · actions require an explicit slash command</span>
           </div>
           <div className="convo-style">
             Choose a conversation style

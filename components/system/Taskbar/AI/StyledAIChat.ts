@@ -74,6 +74,36 @@ const StyledAIChat = styled(motion.section)<StyledAIChatProps>`
         }
       }
 
+      .module-head {
+        display: grid;
+        gap: 6px;
+        max-width: 300px;
+        width: calc(100% - 32px);
+
+        label,
+        span {
+          font-size: 11px;
+        }
+
+        label {
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+        select {
+          background-color: rgb(32 32 32);
+          border: 1px solid rgb(102 102 102);
+          border-radius: 4px;
+          color: #fff;
+          font-family: ${({ theme }) => theme.formats.systemFont};
+          padding: 8px;
+        }
+
+        span {
+          color: rgb(190 190 190);
+        }
+      }
+
       .convo-style {
         display: flex;
         flex-direction: column;
