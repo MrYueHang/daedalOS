@@ -46,10 +46,7 @@ const WEB_LLM_MODEL_CONFIG = {
   presence_penalty: 0,
   top_p: 0.9,
 };
-const DEFAULT_SYSTEM_PROMPT: ChatCompletionMessageParam = {
-  content: "You are a helpful AI assistant.",
-  role: "system",
-};
+const DEFAULT_SYSTEM_PROMPT = "You are a helpful AI assistant.";
 
 const abortController = new AbortController();
 let cancel = false;
@@ -75,7 +72,7 @@ globalThis.addEventListener(
       }
     } else if (data.id && data.text && data.style) {
       responding = true;
-      const systemPrompt = data.systemPrompt || DEFAULT_SYSTEM_PROMPT.content;
+      const systemPrompt = data.systemPrompt || DEFAULT_SYSTEM_PROMPT;
       const systemPromptMessage: ChatCompletionMessageParam = {
         content: systemPrompt,
         role: "system",
