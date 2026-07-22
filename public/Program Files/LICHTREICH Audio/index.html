@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Head of Module · Audio Publication</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #090b0f; color: #f5f7fa; }
+    header { position: sticky; top: 0; z-index: 2; padding: 18px 22px; background: rgba(9,11,15,.94); border-bottom: 1px solid #27303b; backdrop-filter: blur(12px); }
+    h1 { margin: 0; font-size: 22px; letter-spacing: .02em; }
+    .sub { margin-top: 6px; color: #aab6c5; font-size: 13px; }
+    main { padding: 20px; display: grid; gap: 18px; }
+    .banner { padding: 15px 17px; border: 1px solid #3c4858; border-radius: 12px; background: #111722; }
+    .banner strong { color: #9fd5ff; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); gap: 12px; }
+    .card { min-height: 148px; padding: 15px; border: 1px solid #27303b; border-radius: 12px; background: #10141b; display: flex; flex-direction: column; gap: 8px; }
+    .card h2 { margin: 0; font-size: 17px; }
+    .card p { margin: 0; color: #aab6c5; line-height: 1.45; font-size: 13px; }
+    .tag { width: max-content; padding: 3px 8px; border-radius: 999px; background: #202b39; color: #b9ddff; font-size: 11px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; padding-top: 8px; }
+    a { display: inline-block; padding: 8px 10px; border-radius: 8px; background: #e9f2ff; color: #07101d; font-weight: 700; font-size: 12px; text-decoration: none; }
+    a.secondary { background: #263241; color: #e8f1fb; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 10px; background: #10141b; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #27303b; text-align: left; font-size: 12px; vertical-align: top; }
+    th { color: #9fd5ff; background: #141b25; }
+    .ok { color: #75e6a4; }
+    .warn { color: #ffd27a; }
+    .planned { color: #b8b6ff; }
+    code { color: #d9e9ff; }
+    footer { padding: 18px 20px 26px; color: #7f8b99; font-size: 11px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Head of Module · Audio Publication</h1>
+  <div class="sub">TAKTØR → Rechte-Gate → Veröffentlichung → eigener Hub → Analytics</div>
+</header>
+<main>
+  <section class="banner">
+    <strong>Entscheidung:</strong> YouTube + Audius als öffentliche Primärkanäle, Mixcloud für lange DJ-Sets, SoundCloud nur ergänzend. Medienmaster bleiben außerhalb von GitHub. Der Desktop öffnet jedes Ziel als eigene Browser-App über die Startmenü-Shortcuts.
+  </section>
+
+  <section class="grid">
+    <article class="card">
+      <span class="tag">PRIMÄR · REICHWEITE</span>
+      <h2>YouTube Studio</h2>
+      <p>Visualizer, Langsessions, Kapitel, Suche, Playlists und belastbare Analytics.</p>
+      <div class="actions"><a href="https://studio.youtube.com/">Studio öffnen</a><a class="secondary" href="https://www.youtube.com/">Kanalansicht</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">PRIMÄR · AUDIO</span>
+      <h2>Audius</h2>
+      <p>Audio-native Veröffentlichung eigener Tracks und längerer Sessions.</p>
+      <div class="actions"><a href="https://audius.co/upload">Upload öffnen</a><a class="secondary" href="https://audius.co/">Profil öffnen</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">DJ-SETS · LONGFORM</span>
+      <h2>Mixcloud</h2>
+      <p>Ausgewählte Shows und lange DJ-Sets. Nicht als einziges Dauerarchiv behandeln.</p>
+      <div class="actions"><a href="https://www.mixcloud.com/upload/">Upload öffnen</a><a class="secondary" href="https://www.mixcloud.com/">Profil öffnen</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">ERGÄNZUNG</span>
+      <h2>SoundCloud</h2>
+      <p>Die MP3-Dateien sind technisch zulässig. Der kostenlose Account ist jedoch auf insgesamt 120 Minuten begrenzt.</p>
+      <div class="actions"><a href="https://soundcloud.com/you/tracks">Restzeit prüfen</a><a class="secondary" href="https://soundcloud.com/upload">Einzelupload testen</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">SOURCE OF TRUTH</span>
+      <h2>Copyparty</h2>
+      <p>Leichter Datei-, Medien- und Freigabeserver. Später unter <code>files.lichtreich.info</code>; lokal standardmäßig Port 3923.</p>
+      <div class="actions"><a href="http://localhost:3923/">Lokal öffnen</a><a class="secondary" href="https://files.lichtreich.info/">Cloud-Endpunkt</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">PROJEKTSPEICHER</span>
+      <h2>Drive / Box / Dropbox</h2>
+      <p>Als Speicheradapter und Intake, nicht als öffentlicher Musikplayer und nicht als alleinige Source of Truth.</p>
+      <div class="actions"><a href="https://drive.google.com/drive/my-drive">Drive</a><a class="secondary" href="https://app.box.com/folder/0">Box</a><a class="secondary" href="https://www.dropbox.com/home">Dropbox</a></div>
+    </article>
+  </section>
+
+  <section>
+    <h2>Betriebsmodell</h2>
+    <table>
+      <thead><tr><th>Schicht</th><th>Werkzeug</th><th>Aufgabe</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Produktion</td><td>TAKTØR / Mixxx / YouDJ extern</td><td>Mix, Master, Recording, Kapitel</td><td class="planned">Anbindung</td></tr>
+        <tr><td>Ingest</td><td>Copyparty + Drive-Adapter</td><td>Upload, Hash, Version, Ablage</td><td class="planned">MVP</td></tr>
+        <tr><td>Orchestrierung</td><td>n8n + Head of Module</td><td>QC, Rechte-Gate, Render, Publish, Retry</td><td class="planned">MVP</td></tr>
+        <tr><td>Öffentlich</td><td>YouTube + Audius + Mixcloud</td><td>Hören, Discovery, Embeds</td><td class="ok">sofort nutzbar</td></tr>
+        <tr><td>Eigener Hub</td><td>audio.lichtreich.info</td><td>Kanonische URL, Player, Katalog</td><td class="planned">Ausbau</td></tr>
+        <tr><td>Analytics</td><td>Directus + Metabase</td><td>KPI-Normalisierung über Asset-ID</td><td class="planned">Ausbau</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Speicher-Fakten</h2>
+    <table>
+      <thead><tr><th>Anbieter</th><th>Kostenlos</th><th>Einordnung</th></tr></thead>
+      <tbody>
+        <tr><td>Google-Konto</td><td>15 GB gemeinsam für Drive, Gmail und Fotos</td><td class="warn">Kein 5-GB-Projektkonto; Trennung per eigenem Konto ist möglich, aber Betrieb und Recovery müssen verwaltet werden.</td></tr>
+        <tr><td>Box Individual</td><td>10 GB; 250 MB je Datei</td><td>Für eure 30–50-MB-MP3 technisch passend.</td></tr>
+        <tr><td>Dropbox Basic</td><td>2 GB</td><td>Für Intake/Sync, als Audioarchiv schnell zu klein.</td></tr>
+        <tr><td>Copyparty</td><td>begrenzt durch den angebundenen Datenträger</td><td>Kann lokale Volumes oder per rclone gemountete Cloudspeicher anbieten.</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+<footer>LICHTREICH Cloud-Computer · Audio Publication Module · MVP branch feat/lichtreich-audio-head-module</footer>
+</body>
+</html>
