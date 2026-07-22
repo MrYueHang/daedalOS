@@ -60,6 +60,7 @@ import { useSnapshots } from "hooks/useSnapshots";
 import { useProcesses } from "contexts/process";
 import {
   DESKTOP_PROCESS_IDS,
+  LICHTREICH_MODULES,
   MODULE_HEADS,
   isDesktopProcessId,
 } from "components/system/Taskbar/AI/moduleHeads";
@@ -137,7 +138,7 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
       if (command === "/help") {
         addMessage(escapeHtml(text), "user");
         addMessage(
-          "Available local commands:\n\n- `/apps` lists openable desktop apps.\n- `/open Browser https://example.org` opens a verified web URL.\n- `/open FileExplorer /Documents` opens a local folder.\n- `/open Paint` opens an app.\n\nChoose the responsible module head above before asking a domain-specific question.",
+          "Available local commands:\n\n- `/apps` lists native desktop apps.\n- `/modules` lists LICHTREICH modules.\n- `/module board` opens a named module.\n- `/open Browser https://example.org` opens a verified web URL.\n- `/open FileExplorer /Documents` opens a local folder.\n- `/open Paint` opens an app.\n\nChoose the responsible module head above before asking a domain-specific question.",
           "ai"
         );
 
@@ -152,6 +153,38 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
           )}`,
           "ai"
         );
+
+        return true;
+      }
+
+      if (command === "/modules") {
+        addMessage(escapeHtml(text), "user");
+        addMessage(
+          `LICHTREICH modules (${LICHTREICH_MODULES.length}):\n\n${LICHTREICH_MODULES.map(
+            ({ id, label: moduleLabel }) => `${id} (${moduleLabel})`
+          ).join(", ")}`,
+          "ai"
+        );
+
+        return true;
+      }
+
+      if (command === "/module") {
+        addMessage(escapeHtml(text), "user");
+
+        const module = LICHTREICH_MODULES.find(({ id }) => id === processId);
+
+        if (!module) {
+          addMessage(
+            `Not opened: \`${processId || "missing module"}\` is not in the LICHTREICH catalog. Use \`/modules\` to list valid IDs.`,
+            "ai"
+          );
+
+          return true;
+        }
+
+        open("Browser", { url: module.url });
+        addMessage(`Opened \`${module.label}\` at \`${module.url}\`.`, "ai");
 
         return true;
       }
