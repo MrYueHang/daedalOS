@@ -18,6 +18,8 @@ const START_MENU_PATH = `${HOME}/Start Menu`;
 const ICON_PATH = "/System/Icons";
 const SHORTCUT_ICON = `${ICON_PATH}/shortcut.webp`;
 const NEW_FOLDER_ICON = `${ICON_PATH}/new_folder.webp`;
+const WEB_SHORTCUT_ICON = `${ICON_PATH}/chromium.webp`;
+const GOOGLE_FAVICON_URL = "https://www.google.com/s2/favicons";
 
 const USER_ICON_PATH = `${HOME}/Icons`;
 const ICON_CACHE = `${USER_ICON_PATH}/Cache`;
@@ -28,6 +30,9 @@ const VLC_SUBICON = "/System/Icons/16x16/vlc.webp";
 
 const isYouTubeUrl = (url) =>
   url.includes("youtube.com/") || url.includes("youtu.be/");
+
+const getStableShortcutIcon = (icon) =>
+  icon.startsWith(GOOGLE_FAVICON_URL) ? WEB_SHORTCUT_ICON : icon;
 
 const getYouTubeUrlId = (url) => {
   try {
@@ -56,7 +61,7 @@ const getPublicDirectoryIcons = (directory) => [
 
         if (isVideo && url) icons.push(encodeURI(VLC_SUBICON));
 
-        if (icon) icons.push(encodeURI(icon));
+        if (icon) icons.push(encodeURI(getStableShortcutIcon(icon)));
         else {
           if (isVideo && isYouTubeUrl(url)) {
             const iconFileName = `/${getYouTubeUrlId(

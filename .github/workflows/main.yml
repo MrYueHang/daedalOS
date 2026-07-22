@@ -1,31 +1,89 @@
-name: Tests
+name: CI
 
 on:
+  pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  tests:
+  verify:
+    name: Lint, test, build, and E2E
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      CI: true
+      NODE_OPTIONS: --openssl-legacy-provider
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
+          cache: yarn
           node-version: 22
-      - name: Install Dependencies
-        run: NODE_OPTIONS='--openssl-legacy-provider' yarn
-      - name: Run Jest Unit Tests
-        run: yarn test
-      - name: Build App
+
+      - name: Install locked dependencies
+        run: yarn install --frozen-lockfile --non-interactive
+
+      - name: Generate runtime indexes
+        run: yarn build:prebuild
+
+      - name: Run ESLint
+        run: yarn eslint
+
+      - name: Run TypeScript check
+        run: yarn tsc --noEmit
+
+      - name: Run Jest unit tests
+        run: yarn test --runInBand
+
+      - name: Build production app
         run: yarn build
-      - name: Install Playwright Browsers
+
+      - name: Install Chromium for pull-request smoke test
+        if: github.event_name == 'pull_request'
+        run: yarn playwright install --with-deps chromium
+
+      - name: Run Chromium E2E smoke test
+        if: github.event_name == 'pull_request'
+        run: yarn e2e --project=chromium
+
+      - name: Install all Playwright browsers
+        if: github.event_name != 'pull_request'
         run: yarn playwright install --with-deps
-      - name: Run Playwright E2E Tests
+
+      - name: Run full cross-browser E2E tests
+        if: github.event_name != 'pull_request'
         run: yarn e2e
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload Playwright report
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          if-no-files-found: ignore
+          name: playwright-report-${{ github.run_id }}
           path: playwright-report
-          retention-days: 30
+          retention-days: 14
+
+      - name: Write run summary
+        if: always()
+        run: |
+          {
+            echo "## daedalOS CI"
+            echo
+            echo "- Result: **${{ job.status }}**"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Trigger: \`${GITHUB_EVENT_NAME}\`"
+            echo "- Ref: \`${GITHUB_REF_NAME}\`"
+            echo "- Details: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } >> "$GITHUB_STEP_SUMMARY"

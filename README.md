@@ -2,6 +2,8 @@
 
 ## _Desktop environment in the browser_
 
+[![CI](https://github.com/MrYueHang/daedalOS/actions/workflows/main.yml/badge.svg)](https://github.com/MrYueHang/daedalOS/actions/workflows/main.yml)
+
 ![Screenshot](https://raw.githubusercontent.com/DustinBrett/daedalOS/refs/heads/main/public/screenshot.png?raw=true)
 
 ### Feature Overview
@@ -271,3 +273,11 @@ docker run -dp 3000:3000 --rm --name daedalos daedalos
 ##### Notes
 
 - If during `yarn install` you receive the error `digital envelope routines::unsupported`, you need to set `NODE_OPTIONS` to `--openssl-legacy-provider` ([1](https://github.com/DustinBrett/daedalOS/blob/main/Dockerfile#L3), [2](https://github.com/DustinBrett/daedalOS/blob/main/.github/workflows/main.yml#L17), [3](https://stackoverflow.com/a/69699772/5895982))
+
+##### Build and diagnostics
+
+- [GitHub Actions](https://github.com/MrYueHang/daedalOS/actions/workflows/main.yml) shows every active, completed, cancelled, or failed CI run.
+- CI runs for every pull request, every push to `main`, and on manual request.
+- Each run exposes separate install, lint, TypeScript, unit-test, build, and browser-test steps.
+- The Playwright report is retained as a downloadable artifact for 14 days, including failed runs when a report was produced.
+- Vercel deployment status remains separate from CI and is visible on the corresponding commit or pull request.
