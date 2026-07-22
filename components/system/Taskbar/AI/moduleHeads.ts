@@ -30,6 +30,56 @@ export const DESKTOP_PROCESS_IDS = [
 
 export type DesktopProcessId = (typeof DESKTOP_PROCESS_IDS)[number];
 
+export const LICHTREICH_MODULES = [
+  { id: "landing", label: "LICHTREICH", url: "https://lichtreich.info" },
+  { id: "board", label: "Board", url: "https://board.lichtreich.info" },
+  {
+    id: "briefkasten",
+    label: "Briefkasten",
+    url: "https://briefkasten.lichtreich.info",
+  },
+  { id: "crm", label: "CRM", url: "https://crm.lichtreich.info" },
+  {
+    id: "formulare",
+    label: "Formulare",
+    url: "https://formulare.lichtreich.info",
+  },
+  {
+    id: "herrkuenstler",
+    label: "Herrkünstler",
+    url: "https://herrkuenstler.lichtreich.info",
+  },
+  { id: "ingest", label: "Ingest", url: "https://ingest.lichtreich.info" },
+  { id: "me", label: "Mein Bereich", url: "https://me.lichtreich.info" },
+  { id: "n8n", label: "n8n", url: "https://n8n.lichtreich.info" },
+  { id: "dms", label: "Papiere", url: "https://dms.lichtreich.info" },
+  { id: "pdf", label: "PDF-Werkbank", url: "https://pdf.lichtreich.info" },
+  { id: "society", label: "Society", url: "https://society.lichtreich.info" },
+  {
+    id: "whiteboard",
+    label: "Whiteboard",
+    url: "https://whiteboard.lichtreich.info",
+  },
+  {
+    id: "metabase",
+    label: "Zahlen",
+    url: "https://metabase.lichtreich.info",
+  },
+  { id: "rag", label: "RAG", url: "https://rag.lichtreich.info" },
+  {
+    id: "orchestra",
+    label: "Orchestra",
+    url: "https://orchestra.lichtreich.info",
+  },
+  { id: "mandat", label: "Mandat", url: "https://mandat.lichtreich.info" },
+  { id: "consult", label: "Consult", url: "https://consult.lichtreich.info" },
+  { id: "dateien", label: "Dateien", url: "https://dateien.lichtreich.info" },
+  { id: "projekte", label: "Projekte", url: "https://projekte.lichtreich.info" },
+  { id: "subs", label: "Subdomains", url: "https://subs.lichtreich.info" },
+  { id: "tickets", label: "Tickets", url: "https://tickets.lichtreich.info" },
+  { id: "setup", label: "Setup", url: "https://setup.lichtreich.info" },
+] as const;
+
 export type ModuleHead = {
   id: string;
   label: string;
@@ -40,7 +90,7 @@ const SHARED_POLICY = [
   "You are running locally inside LICHTREICH desktop OS.",
   "Be concise, state uncertainty, and distinguish UI, API, workflow, rights, and deployment evidence.",
   "Never claim that an app, file, URL, or workflow was opened or changed unless the desktop reports that deterministic action.",
-  "Desktop actions are only available through the visible slash commands /apps, /open, and /help; do not invent other tools.",
+  "Desktop actions are only available through the visible slash commands /apps, /modules, /module, /open, and /help; do not invent other tools.",
 ].join(" ");
 
 export const MODULE_HEADS: ModuleHead[] = [
