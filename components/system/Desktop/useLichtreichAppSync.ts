@@ -101,12 +101,15 @@ const useLichtreichAppSync = (): void => {
   const syncedRef = useRef(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     if (!CONTROL_PLANE_URL || !rootFs || !sessionLoaded || syncedRef.current) {
-      return undefined;
+      return () => {
+        controller.abort();
+      };
     }
 
     syncedRef.current = true;
-    const controller = new AbortController();
 
     const syncApps = async (): Promise<void> => {
       emitStatus("syncing");
@@ -183,11 +186,13 @@ const useLichtreichAppSync = (): void => {
           }
         )
       );
-      const nextInstalled = Object.fromEntries(
-        installedEntries.filter(
-          (entry): entry is [string, InstalledAppState] => Boolean(entry)
-        )
-      );
+      const validInstalledEntries: Array<[string, InstalledAppState]> = [];
+
+      installedEntries.forEach((entry) => {
+        if (entry) validInstalledEntries.push(entry);
+      });
+
+      const nextInstalled = Object.fromEntries(validInstalledEntries);
 
       await Promise.all(
         Object.entries(previousState?.installed || {}).map(
