@@ -172,9 +172,11 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
       if (command === "/module") {
         addMessage(escapeHtml(text), "user");
 
-        const module = LICHTREICH_MODULES.find(({ id }) => id === processId);
+        const lichtreichModule = LICHTREICH_MODULES.find(
+          ({ id }) => id === processId
+        );
 
-        if (!module) {
+        if (!lichtreichModule) {
           addMessage(
             `Not opened: \`${processId || "missing module"}\` is not in the LICHTREICH catalog. Use \`/modules\` to list valid IDs.`,
             "ai"
@@ -183,8 +185,11 @@ const AIChat: FC<AIChatProps> = ({ toggleAI }) => {
           return true;
         }
 
-        open("Browser", { url: module.url });
-        addMessage(`Opened \`${module.label}\` at \`${module.url}\`.`, "ai");
+        open("Browser", { url: lichtreichModule.url });
+        addMessage(
+          `Opened \`${lichtreichModule.label}\` at \`${lichtreichModule.url}\`.`,
+          "ai"
+        );
 
         return true;
       }
