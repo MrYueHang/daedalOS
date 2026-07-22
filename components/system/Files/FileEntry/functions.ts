@@ -76,6 +76,9 @@ type VideoElementWithSeek = HTMLVideoElement & {
   seekToNextFrame: () => Promise<void>;
 };
 
+const GOOGLE_FAVICON_URL = "https://www.google.com/s2/favicons";
+const WEB_SHORTCUT_ICON = "/System/Icons/chromium.webp";
+
 export const isExistingFile = (
   { birthtimeMs, ctimeMs }: Stats = {} as Stats
 ): boolean => Boolean(birthtimeMs && birthtimeMs === ctimeMs);
@@ -171,7 +174,7 @@ export const getShortcutInfo = (
 
   return {
     comment,
-    icon,
+    icon: icon.startsWith(GOOGLE_FAVICON_URL) ? WEB_SHORTCUT_ICON : icon,
     pid,
     type,
     url,
