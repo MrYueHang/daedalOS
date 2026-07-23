@@ -481,11 +481,32 @@ const Browser: FC<ComponentProcessProps> = ({ id }) => {
         ref={iframeRef}
         onLoad={() => {
           try {
-            iframeRef.current?.contentWindow?.addEventListener("focus", () =>
+            const { contentWindow } = iframeRef.current || {};
+
+            contentWindow?.addEventListener("focus", () =>
               setForegroundId(id)
             );
+
+            if (srcDoc) {
+              contentWindow?.document.body
+                .querySelectorAll<HTMLAnchorElement>("a[href]")
+                .forEach((anchor) => {
+                  anchor.addEventListener("click", (event) => {
+                    const { href } = event.currentTarget as HTMLAnchorElement;
+                    const targetUrl = new URL(href);
+
+                    if (
+                      ["http:", "https:"].includes(targetUrl.protocol) &&
+                      targetUrl.origin !== window.location.origin
+                    ) {
+                      event.preventDefault();
+                      goToLink(targetUrl.href);
+                    }
+                  });
+                });
+            }
           } catch {
-            // Ignore failure to add focus event listener
+            // Ignore failure to access iframe listeners
           }
 
           if (loading) setLoading(false);

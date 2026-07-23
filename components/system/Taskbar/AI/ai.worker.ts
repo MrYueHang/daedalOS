@@ -46,10 +46,7 @@ const WEB_LLM_MODEL_CONFIG = {
   presence_penalty: 0,
   top_p: 0.9,
 };
-const SYSTEM_PROMPT: ChatCompletionMessageParam = {
-  content: "You are a helpful AI assistant.",
-  role: "system",
-};
+const DEFAULT_SYSTEM_PROMPT = "You are a helpful AI assistant.";
 
 const abortController = new AbortController();
 let cancel = false;
@@ -75,6 +72,11 @@ globalThis.addEventListener(
       }
     } else if (data.id && data.text && data.style) {
       responding = true;
+      const systemPrompt = data.systemPrompt || DEFAULT_SYSTEM_PROMPT;
+      const systemPromptMessage: ChatCompletionMessageParam = {
+        content: systemPrompt,
+        role: "system",
+      };
 
       if (sessionId !== data.id) {
         sessionId = data.id;
@@ -87,12 +89,12 @@ globalThis.addEventListener(
           const config: AILanguageModelCreateOptionsWithSystemPrompt = {
             ...CONVO_STYLE_TEMPS[data.style],
             signal: abortController.signal,
-            systemPrompt: SYSTEM_PROMPT.content,
+            systemPrompt,
           };
 
           session = await globalThis.ai.languageModel.create(config);
         } else {
-          prompts = [];
+          prompts = [systemPromptMessage as Prompt];
 
           if (!engine) {
             const { CreateMLCEngine } = await import("@mlc-ai/web-llm");
@@ -128,7 +130,7 @@ globalThis.addEventListener(
         const config: AILanguageModelCreateOptionsWithSystemPrompt = {
           ...CONVO_STYLE_TEMPS[data.style],
           initialPrompts: [
-            SYSTEM_PROMPT as unknown as AILanguageModelPrompt,
+            systemPromptMessage as unknown as AILanguageModelPrompt,
             ...(prompts as AILanguageModelPrompt[]),
           ],
         };

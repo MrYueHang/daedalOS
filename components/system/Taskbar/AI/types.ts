@@ -37,6 +37,7 @@ export type WorkerMessage = {
   streamId?: number;
   style: ConvoStyles;
   summarizeText?: string;
+  systemPrompt?: string;
   text: string;
 };
 
