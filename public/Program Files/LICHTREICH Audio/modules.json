@@ -1,0 +1,78 @@
+{
+  "module": "audio-publication",
+  "title": "Head of Module · Audio Publication",
+  "version": "0.1.0",
+  "canonicalHost": "audio.lichtreich.info",
+  "sourceOfTruth": {
+    "metadata": "Directus",
+    "media": "Copyparty volume / S3-compatible storage",
+    "workflow": "n8n",
+    "code": "GitHub"
+  },
+  "targets": [
+    {
+      "id": "youtube",
+      "role": "primary-reach",
+      "url": "https://studio.youtube.com/",
+      "enabled": true,
+      "automation": "youtube-data-api"
+    },
+    {
+      "id": "audius",
+      "role": "primary-audio",
+      "url": "https://audius.co/upload",
+      "enabled": true,
+      "automation": "adapter-poc"
+    },
+    {
+      "id": "mixcloud",
+      "role": "dj-set-longform",
+      "url": "https://www.mixcloud.com/upload/",
+      "enabled": true,
+      "automation": "mixcloud-api"
+    },
+    {
+      "id": "soundcloud",
+      "role": "optional-community",
+      "url": "https://soundcloud.com/upload",
+      "enabled": false,
+      "reason": "free total upload allowance is insufficient for the long-form catalogue"
+    }
+  ],
+  "storageAdapters": [
+    {
+      "id": "copyparty",
+      "type": "primary-ingest",
+      "localUrl": "http://localhost:3923/",
+      "plannedUrl": "https://files.lichtreich.info/"
+    },
+    {
+      "id": "google-drive",
+      "type": "project-intake",
+      "freeQuotaGb": 15,
+      "quotaSharedWith": ["Gmail", "Google Photos"]
+    },
+    {
+      "id": "box",
+      "type": "project-intake",
+      "freeQuotaGb": 10,
+      "maxFileMb": 250
+    },
+    {
+      "id": "dropbox",
+      "type": "sync-intake",
+      "freeQuotaGb": 2
+    }
+  ],
+  "workflow": [
+    "ingest",
+    "checksum",
+    "audio-qc",
+    "rights-gate",
+    "derive",
+    "approve",
+    "publish",
+    "syndicate",
+    "measure"
+  ]
+}
